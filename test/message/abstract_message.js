@@ -1,15 +1,18 @@
 var AbstractMessage = require('../../lib/message/abstract_message');
 var createTestContext = require('../test/test_context');
 var test = require('cached-tape');
+var util = require('util');
 
 var context = createTestContext('AbstractMessage');
 var describe = context.describe;
 var method = context.method;
 var property = context.property;
 
-var TestMessage = AbstractMessage.extend({
-    type: 'Test'
-}, { });
+function TestMessage() {
+    AbstractMessage.apply(this, arguments);
+}
+util.inherits(TestMessage, AbstractMessage);
+TestMessage.type = 'Test';
 
 describe(property('type'), function(thing) {
 
