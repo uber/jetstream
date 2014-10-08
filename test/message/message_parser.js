@@ -1,11 +1,11 @@
 var _ = require('underscore');
-var createContext = require('../lib/context');
+var createTestContext = require('../test/test_context');
 var MessageParser = require('../../lib/message/message_parser');
 var ReplyMessage = require('../../lib/message/reply_message');
 var SessionCreateMessage = require('../../lib/message/session_create_message');
 var test = require('cached-tape');
 
-var context = createContext('MessageParser');
+var context = createTestContext('MessageParser');
 var describe = context.describe;
 var method = context.method;
 

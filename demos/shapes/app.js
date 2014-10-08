@@ -22,7 +22,6 @@ var ShapesDemo = jetstream.model('ShapesDemo', function() {
 
 // Example of connecting multiple clients to a shared scope
 var scope = new jetstream.Scope({name: 'ShapesDemo'});
-scope.uses(new jetstream.middleware.persist.Memory());
 var shapesDemo = new ShapesDemo();
 shapesDemo.setScopeAndMakeRootModel(scope);
 

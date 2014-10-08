@@ -1,8 +1,8 @@
 var AbstractMessage = require('../../lib/message/abstract_message');
-var createContext = require('../lib/context');
+var createTestContext = require('../test/test_context');
 var test = require('cached-tape');
 
-var context = createContext('AbstractMessage');
+var context = createTestContext('AbstractMessage');
 var describe = context.describe;
 var method = context.method;
 var property = context.property;

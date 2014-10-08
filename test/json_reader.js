@@ -1,9 +1,9 @@
 var _ = require('underscore');
-var createContext = require('./lib/context');
+var createTestContext = require('./test/test_context');
 var JSONReader = require('../lib/json_reader');
 var test = require('cached-tape');
 
-var context = createContext('JSONReader');
+var context = createTestContext('JSONReader');
 var describe = context.describe;
 var method = context.method;
 

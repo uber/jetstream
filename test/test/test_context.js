@@ -1,7 +1,7 @@
 
-module.exports = createContext;
+module.exports = createTestContext;
 
-function createContext(componentName) {
+function createTestContext(componentName) {
     return {
         component: component,
         method: method,
