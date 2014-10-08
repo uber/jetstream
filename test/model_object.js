@@ -1,7 +1,6 @@
 var _ = require('underscore');
 var async = require('async');
 var createTestContext = require('./test/test_context');
-var MemoryPersistMiddleware = require('../lib/middleware/persist/memory_persist_middleware');
 var ModelObject = require('../lib/model_object');
 var Scope = require('../lib/scope');
 var sinon = require('sinon');
@@ -37,7 +36,7 @@ describe(method('model'), 'when defining a model', function(thing) {
 
     test(thing('should call the definition'), function t(assert) {
         var spy = sinon.spy();
-        var SomeModel = ModelObject.model('SomeModel', spy);
+        ModelObject.model('SomeModel', spy);
         assert.equal(spy.calledOnce, true);
         assert.end();
     });
@@ -65,7 +64,7 @@ describe(method('has'), 'when defining model properties', function(thing) {
 
     test(thing('should throw when redefining a property'), function t(assert) {
         assert.throws(function() {
-            var SomeModel = ModelObject.model('SomeModel', function() {
+            ModelObject.model('SomeModel', function() {
                 this.has('someProperty', String);
                 this.has('someProperty', Number);
             });
@@ -461,10 +460,8 @@ describe(method('setScope'), 'when setting scope', function(thing) {
             assert.equal(someModel.scope, scope);
 
             scope.containsModelObject(someModel, function(err, result) {
-                if (err || !result) {
-                    return nextCallback(err || new Error('First scope did not add ModelObject'));
-                }
-
+                assert.ifError(err);
+                assert.equal(result, true);
                 assert.end();
             });
         });
