@@ -1,7 +1,6 @@
 var _ = require('underscore');
 var async = require('async');
 var createTestContext = require('./test/test_context');
-var LazyModelObject = require('../lib/lazy_model_object');
 var MemoryPersistMiddleware = require('../lib/middleware/persist/memory_persist_middleware');
 var ModelObject = require('../lib/model_object');
 var Scope = require('../lib/scope');
@@ -213,24 +212,6 @@ describe(method('has'), 'when defining primitive model properties', function(thi
         assert.end();
     });
 
-    test(thing('should be able to set ModelObject properties by UUID'), function t(assert) {
-        var Driver = ModelObject.model('Driver', function() {
-            this.has('name', String);
-        });
-
-        var Vehicle = ModelObject.model('Vehicle', function() {
-            this.has('driver', Driver);
-        });
-
-        var vehicle = new Vehicle();
-        var id = uuid.v4();
-
-        vehicle.driver = id;
-        assert.equals(vehicle.driver.uuid, id);
-
-        assert.end();
-    });
-
     test(thing('should not be able to set invalid property values'), function t(assert) {
         var SomeModel = ModelObject.model('SomeModel', function() {
             this.has('numberProperty', Number);
@@ -339,21 +320,6 @@ describe(method('has'), 'when defining collection model properties', function(th
         var parent = new Person();
         var child = new Person();
         parent.children = [child];
-
-        assert.equal(parent.children.length, 1);
-        assert.ok(_.isEqual(parent.children.objectAtIndex(0).uuid, child.uuid));
-
-        assert.end();
-    });
-
-    test(thing('should be able to set ModelObject type properties by UUID'), function t(assert) {
-        var Person = ModelObject.model('SomeModel', function() {
-            this.has('children', [this]);
-        });
-
-        var parent = new Person();
-        var child = new Person();
-        parent.children = [child.uuid];
 
         assert.equal(parent.children.length, 1);
         assert.ok(_.isEqual(parent.children.objectAtIndex(0).uuid, child.uuid));
@@ -841,24 +807,6 @@ describe(method('getParent'), 'when getting a childs parent ModelObject', functi
         });
     });
 
-    test(thing('should callback with error if has parent but scope not set'), function t(assert) {
-        var Person = ModelObject.model('Person', function() {
-            this.has('children', [this]);
-            this.has('name', String);
-        });
-
-        var parent = new Person();
-        parent.name = 'Sam';
-        var child = new Person();
-        child.name = 'Alex';
-        parent.children = [child];
-
-        child.getParent(function(err) {
-            assert.ok(err);
-            assert.end();
-        });
-    });
-
     test(thing('should callback with parent if set as ModelObject'), function t(assert) {
         var Person = ModelObject.model('Person', function() {
             this.has('children', [this]);
@@ -878,117 +826,6 @@ describe(method('getParent'), 'when getting a childs parent ModelObject', functi
                 assert.equal(result, parent);
                 assert.end();
             });
-        });
-    });
-
-    test(thing('should callback with parent if set as LazyModelObject with ModelObject'), function t(assert) {
-        var scope = new Scope({name: 'TestScope'});
-
-        var Person = ModelObject.model('Person', function() {
-            this.has('children', [this]);
-            this.has('name', String);
-        });
-
-        var parent = new Person();
-        parent.scope = scope;
-        parent.name = 'Sam';
-
-        var child = new Person();
-        child.name = 'Alex';
-
-        async.parallel([
-            function addParentToScope(doneCallback) {
-                scope.addModelObject(parent, doneCallback);
-            },
-
-            function addChildToScope(doneCallback) {
-                scope.addModelObject(child, doneCallback);
-            }
-
-        ], function(err) {
-            assert.ifError(err);
-
-            parent.children = [child.uuid];
-
-            child._setParent(new LazyModelObject({
-                creator: parent,
-                modelObject: parent
-            }), 'children');
-
-            child.getParent(function(err, result) {
-                assert.ifError(err);
-                assert.equal(result, parent);
-                assert.end();
-            });
-        });
-    });
-
-    test(thing('should callback with parent if set as LazyModelObject with UUID'), function t(assert) {
-        var scope = new Scope({name: 'TestScope'});
-
-        var Person = ModelObject.model('Person', function() {
-            this.has('children', [this]);
-            this.has('name', String);
-        });
-
-        var parent = new Person();
-        parent.scope = scope;
-        parent.name = 'Sam';
-
-        var child = new Person();
-        child.scope = scope;
-        child.name = 'Alex';
-
-        async.parallel([
-            function addParentToScope(doneCallback) {
-                scope.addModelObject(parent, doneCallback);
-            },
-
-            function addChildToScope(doneCallback) {
-                scope.addModelObject(child, doneCallback);
-            }
-
-        ], function(err) {
-            assert.ifError(err);
-
-            parent.children = [child.uuid];
-
-            child._setParent(new LazyModelObject({
-                creator: parent,
-                uuid: parent.uuid
-            }), 'children');
-
-            child.getParent(function(err, result) {
-                assert.ifError(err);
-                assert.equal(result, parent);
-                assert.end();
-            });
-        });
-    });
-
-    test(thing('should callback with error if parent not set correctly'), function t(assert) {
-        var scope = new Scope({name: 'TestScope'});
-
-        var Person = ModelObject.model('Person', function() {
-            this.has('children', [this]);
-            this.has('name', String);
-        });
-
-        var parent = new Person();
-        parent.scope = scope;
-        parent.name = 'Sam';
-
-        var child = new Person();
-        child.scope = scope;
-        child.name = 'Alex';
-
-        parent.children = [child.uuid];
-
-        child._parentRelationship = {};
-
-        child.getParent(function(err) {
-            assert.ok(err);
-            assert.end();
         });
     });
 
