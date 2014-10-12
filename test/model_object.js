@@ -272,6 +272,35 @@ describe(method('has'), 'when defining primitive model properties', function(thi
         assert.end();
     });
 
+    test(thing('should remove ModelObject parent when removed from a property'), function t(assert) {
+        var Person = ModelObject.model('Person', function() {
+            this.has('bestFriend', this);
+        });
+
+        var person = new Person();
+        person.name = 'Alex';
+
+        var bestFriend = new Person();
+        bestFriend.name = 'Sam';
+
+        person.bestFriend = bestFriend;
+
+        bestFriend.getParentRelationships(function(err, parentRelationships) {
+            assert.ifError(err);
+            assert.equal(parentRelationships.length, 1);
+            assert.equal(parentRelationships[0].parent, person);
+            assert.equal(parentRelationships[0].keyPath, 'bestFriend');
+
+            person.bestFriend = null;
+
+            bestFriend.getParentRelationships(function(err, newParentRelationships) {
+                assert.ifError(err);
+                assert.equal(newParentRelationships.length, 0);
+                assert.end();
+            });
+        });
+    });
+
 });
 
 describe(method('has'), 'when defining collection model properties', function(thing) {
@@ -702,9 +731,9 @@ describe(method('getChildModelObjects'), 'when getting child objects', function(
 
 });
 
-describe(method('getValues'), 'when getting property values', function(thing) {
+describe(method('getAddSyncFragment'), 'when getting ModelObject as an add fragment', function(thing) {
 
-    test(thing('should get collection and primitive value properties'), function t(assert) {
+    test(thing('should get collection, primitive value and ModelObject properties'), function t(assert) {
         var Person = ModelObject.model('Person', function() {
             this.has('name', String);
             this.has('age', Number);
@@ -723,46 +752,30 @@ describe(method('getValues'), 'when getting property values', function(thing) {
         parent.partner = otherParent;
         parent.children = [child1, child2];
 
-        parent.getValues(function(err, values) {
+        parent.getAddSyncFragment(function(err, syncFragment) {
             assert.ifError(err);
-            assert.equal(Object.keys(values).length, 3);
+
+            assert.equal(syncFragment.type, 'add');
+            assert.equal(syncFragment.objectUUID, parent.uuid);
+            assert.equal(syncFragment.clsName, 'Person');
+
+            var values = syncFragment.properties;
+            assert.equal(Object.keys(values).length, 5);
             assert.equal(values.name, 'Sam');
             assert.equal(values.age, 28);
             assert.ok(_.isEqual(values.nicknames, ['samster', 'samsonite']));
+            assert.equal(values.partner, otherParent.uuid);
+            assert.ok(_.isEqual(values.children, [child1.uuid, child2.uuid]));
+
             assert.end();
         });
     });
 
 });
 
-describe(method('getAddSyncFragment'), 'when getting an \'add\' SyncFragment representation', function(thing) {
+describe(method('getParentRelationships'), 'when getting a child\'s parents', function(thing) {
 
-    test(thing('should set the `parent` and `keyPath` fields if child object'), function t(assert) {
-        var Person = ModelObject.model('Person', function() {
-            this.has('children', [this]);
-            this.has('name', String);
-        });
-
-        var parent = new Person();
-        parent.name = 'Sam';
-        var child = new Person();
-        child.name = 'Alex';
-        parent.children = [child];
-
-        child.getAddSyncFragment(function(err, syncFragment) {
-            assert.ifError(err);
-            assert.equal(syncFragment.type, 'add');
-            assert.equal(syncFragment.objectUUID, child.uuid);
-            assert.equal(syncFragment.clsName, 'Person');
-            assert.equal(syncFragment.parentUUID, parent.uuid);
-            assert.equal(syncFragment.keyPath, 'children');
-            assert.equal(Object.keys(syncFragment.properties).length, 1);
-            assert.equal(syncFragment.properties.name, 'Alex');
-            assert.end();
-        });
-    });
-
-    test(thing('should not set the `parent` and `keyPath` fields if not child object'), function t(assert) {
+    test(thing('should callback with empty array if none set'), function t(assert) {
         var Person = ModelObject.model('Person', function() {
             this.has('children', [this]);
             this.has('name', String);
@@ -771,56 +784,62 @@ describe(method('getAddSyncFragment'), 'when getting an \'add\' SyncFragment rep
         var person = new Person();
         person.name = 'Alex';
 
-        person.getAddSyncFragment(function(err, syncFragment) {
+        person.getParentRelationships(function(err, parentRelationships) {
             assert.ifError(err);
-            assert.equal(syncFragment.type, 'add');
-            assert.equal(syncFragment.objectUUID, person.uuid);
-            assert.equal(syncFragment.clsName, 'Person');
-            assert.equal(syncFragment.parentUUID, undefined);
-            assert.equal(syncFragment.keyPath, undefined);
-            assert.equal(Object.keys(syncFragment.properties).length, 1);
-            assert.equal(syncFragment.properties.name, 'Alex');
+            assert.equal(parentRelationships instanceof Array, true);
+            assert.equal(parentRelationships.length, 0);
             assert.end();
         });
     });
 
-});
-
-describe(method('getParent'), 'when getting a childs parent ModelObject', function(thing) {
-
-    test(thing('should callback with undefined if not set'), function t(assert) {
-        var Person = ModelObject.model('Person', function() {
-            this.has('children', [this]);
+    test(thing('should callback with unique set of parent and keyPaths and remove correctly'), function t(assert) {
+        var Driver = ModelObject.model('Driver', function() {
             this.has('name', String);
         });
 
-        var person = new Person();
-        person.name = 'Alex';
-
-        person.getParent(function(err, parent) {
-            assert.ifError(err);
-            assert.equal(parent, undefined);
-            assert.end();
-        });
-    });
-
-    test(thing('should callback with parent if set as ModelObject'), function t(assert) {
-        var Person = ModelObject.model('Person', function() {
-            this.has('children', [this]);
+        var Rider = ModelObject.model('Rider', function() {
+            this.has('lastThreeDrivers', [Driver]);
+            this.has('currentDriver', Driver);
             this.has('name', String);
         });
 
-        var parent = new Person();
-        parent.name = 'Sam';
-        var child = new Person();
-        child.name = 'Alex';
-        parent.children = [child];
+        var driver = new Driver();
+        driver.name = 'Sam';
 
-        parent.setIsScopeRoot(true, function(err) {
+        var otherDriver = new Driver();
+        otherDriver.name = 'Pat';
+
+        var rider = new Rider();
+        rider.name = 'Alex';
+        rider.currentDriver = driver;
+        rider.lastThreeDrivers = [driver, driver, otherDriver];
+
+        var otherRider = new Rider();
+        otherRider.name = 'Jo';
+        otherRider.currentDriver = driver;
+
+        driver.getParentRelationships(function(err, parentRelationships) {
             assert.ifError(err);
-            child.getParent(function(err, result) {
+
+            assert.ok(_.isEqual([
+                rider, 
+                rider, 
+                otherRider
+            ], _.pluck(parentRelationships, 'parent')));
+
+            assert.ok(_.isEqual([
+                'currentDriver', 
+                'lastThreeDrivers', 
+                'currentDriver'
+            ], _.pluck(parentRelationships, 'keyPath')));
+
+            rider.currentDriver = null;
+            rider.lastThreeDrivers = [otherDriver];
+
+            driver.getParentRelationships(function(err, newParentRelationships) {
                 assert.ifError(err);
-                assert.equal(result, parent);
+                assert.ok(_.isEqual([otherRider], _.pluck(parentRelationships, 'parent')));
+                assert.ok(_.isEqual(['currentDriver'], _.pluck(parentRelationships, 'keyPath')));
                 assert.end();
             });
         });
@@ -828,37 +847,94 @@ describe(method('getParent'), 'when getting a childs parent ModelObject', functi
 
 });
 
-describe(method('getKeyPath'), 'when retrieving keyPath relative to parent', function(thing) {
+describe(method('_addParent'), 'when adding parent relationships', function(thing) {
 
-    test(thing('should return null if no parent set'), function t(assert) {
-        var Person = ModelObject.model('Person', function() {
-            this.has('children', [this]);
-            this.has('name', String);
+    test(thing('should throw if passed invalid parent or keyPath'), function t(assert) {
+        var SomeModel = ModelObject.model('SomeModel', function() {
+            this.has('aProperty', String);
         });
 
-        var person = new Person();
-        person.name = 'Sam';
+        var someModel = new SomeModel();
 
-        assert.equal(person.getKeyPath(), null);
+        assert.throws(function() {
+            someModel._addParent('notamodel', 'someKeyPath');
+        }, /Invalid parent or keyPath/);
+
+        assert.throws(function() {
+            someModel._addParent(new SomeModel(), 1);
+        }, /Invalid parent or keyPath/);
+
         assert.end();
     });
 
-    test(thing('should return correct keyPath if parent has been set'), function t(assert) {
-        var Person = ModelObject.model('Person', function() {
-            this.has('children', [this]);
-            this.has('name', String);
+    test(thing('should throw if passed parent with different scope'), function t(assert) {
+        var SomeModel = ModelObject.model('SomeModel', function() {
+            this.has('someModelProperty', this);
         });
 
-        var parent = new Person();
-        parent.name = 'Sam';
+        var someModel = new SomeModel();
+        someModel.setIsScopeRoot(true, function(err) {
+            assert.ifError(err);
 
-        var child = new Person();
-        child.name = 'Alex';
-        parent.children = [child];
+            var someOtherModel = new SomeModel();
+            someOtherModel.setIsScopeRoot(true, function(err) {
+                assert.ifError(err);
 
-        assert.equal(child.getKeyPath(), 'children');
-        assert.end();
-    });    
+                assert.throws(function() {
+                    someModel._addParent(someOtherModel, 'someModelProperty');
+                }, /differing scope/);
+                assert.end();
+            });
+        });
+    });
 
 });
 
+describe(method('_removeParent'), 'when removing parent relationships', function(thing) {
+
+    test(thing('should throw if passed invalid parent or keyPath'), function t(assert) {
+        var SomeModel = ModelObject.model('SomeModel', function() {
+            this.has('someModelProperty', this);
+        });
+
+        var someModel = new SomeModel();
+        var someOtherModel = new SomeModel();
+        someModel.someModelProperty = someOtherModel;
+
+        assert.throws(function() {
+            someModel._removeParent('notamodel', 'someModelProperty');
+        }, /Invalid parent or keyPath/);
+
+        assert.throws(function() {
+            someModel._removeParent(someOtherModel, 1);
+        }, /Invalid parent or keyPath/);
+
+        assert.end();
+    });
+
+    test(thing('should throw if no such parent at keyPath'), function t(assert) {
+        var Driver = ModelObject.model('Driver', function() {
+            this.has('name', String);
+        });
+
+        var Rider = ModelObject.model('Rider', function() {
+            this.has('currentDriver', Driver);
+            this.has('lastDriver', Driver);
+            this.has('name', String);
+        });
+
+        var currentDriver = new Driver();
+        var lastDriver = new Driver();
+
+        var rider = new Rider();
+        rider.currentDriver = currentDriver;
+        rider.lastDriver = lastDriver;
+
+        assert.throws(function() {
+            currentDriver._removeParent(rider, 'lastDriver');
+        }, /No such parent on keyPath/);
+
+        assert.end();
+    });
+
+});

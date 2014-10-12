@@ -1,19 +1,14 @@
 var jetstream = require('../../');
 
-// Verbose log output
-jetstream.logger.setLevel('debug');
+// Turn on logging and set to verbose
+jetstream.logger.setLevel('verbose');
 
 var Shape = jetstream.model('Shape', function() {
     this.has('x', Number);
     this.has('y', Number);
-});
-
-Shape.model('Square', function() {
-    this.has('length', Number);
-});
-
-Shape.model('Circle', function() {
-    this.has('radius', Number);
+    this.has('width', Number);
+    this.has('height', Number);
+    this.has('color', String);
 });
 
 var ShapesDemo = jetstream.model('ShapesDemo', function() {
