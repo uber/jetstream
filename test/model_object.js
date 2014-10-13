@@ -149,7 +149,7 @@ describe(method('has'), 'when defining primitive model properties', function(thi
 
         var badTime = new Date('notadate');
         someModel.dateProperty = badTime;
-        assert.equal(someModel.dateProperty, undefined);
+        assert.equal(someModel.dateProperty, null);
 
         assert.end();
     });
@@ -224,7 +224,7 @@ describe(method('has'), 'when defining primitive model properties', function(thi
 
         // Cannot possibly convert to a number so should be undefined
         someModel.numberProperty = 'notanumber';
-        assert.equal(someModel.numberProperty, undefined);
+        assert.equal(someModel.numberProperty, null);
 
         // Can convert to a number so should be number equivalent
         someModel.numberProperty = '5';
@@ -244,7 +244,7 @@ describe(method('has'), 'when defining primitive model properties', function(thi
 
         // Relatively strict enforcement for date properties
         someModel.dateProperty = new SomeModel();
-        assert.equal(someModel.dateProperty, undefined);
+        assert.equal(someModel.dateProperty, null);
 
         // Date strings should work as expected however
         someModel.dateProperty = '1999/12/31';
@@ -252,12 +252,12 @@ describe(method('has'), 'when defining primitive model properties', function(thi
 
         // ModelObject types are strict
         someModel.someModelProperty = new Date();
-        assert.equal(someModel.someModelProperty, undefined);
+        assert.equal(someModel.someModelProperty, null);
 
         assert.end();
     });
 
-    test(thing('should be able to set null or undefined property values'), function t(assert) {
+    test(thing('should be able to set null values'), function t(assert) {
         var SomeModel = ModelObject.model('SomeModel', function() {
             this.has('aProperty', String);
         });
@@ -265,9 +265,6 @@ describe(method('has'), 'when defining primitive model properties', function(thi
         var someModel = new SomeModel();
         someModel.aProperty = null;
         assert.equal(someModel.aProperty, null);
-
-        someModel.aProperty = undefined;
-        assert.equal(someModel.aProperty, undefined);
 
         assert.end();
     });

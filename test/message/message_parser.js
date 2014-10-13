@@ -46,7 +46,8 @@ describe(method('parseAsJSON'), 'when reading JSON', function(thing) {
         var json = {
             type: 'SessionCreate',
             params: {},
-            version: '1.0.0'
+            version: '1.0.0',
+            index: 0
         };
         MessageParser.parseAsJSON(json, function(err, message) {
             assert.ifError(err);

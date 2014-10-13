@@ -25,17 +25,23 @@ describe(property('type'), function(thing) {
 
 describe(method('constructor'), function(thing) {
 
-    test(thing('should only set index if index passed as int'), function t(assert) {
+    test(thing('should throw if given invalid index'), function t(assert) {
         var message;
-        message = new AbstractMessage({index: 'a'});
-        assert.equal(message.index, undefined);
+        assert.throws(function() {
+            message = new AbstractMessage({index: 'str'});    
+        }, /requires to be reliably sent/);
 
-        message = new AbstractMessage({index: null});
-        assert.equal(message.index, undefined);
+        assert.end();
+    });
 
-        message = new AbstractMessage({index: 1});
-        assert.equal(message.index, 1);
+    test(thing('should be able to set a replyCallback'), function t(assert) {
+        var replyCallback = function(){};
+        var message = new AbstractMessage({
+            index: 0, 
+            replyCallback: replyCallback
+        });
 
+        assert.equal(message.replyCallback, replyCallback);
         assert.end();
     });
 
@@ -44,9 +50,11 @@ describe(method('constructor'), function(thing) {
 describe(method('toJSON'), function(thing) {
 
     test(thing('should throw when called for an AbstractMessage'), function t(assert) {
-        var message = new AbstractMessage();
+        var message = new AbstractMessage({index: 0});
 
-        assert.throws(function() { message.toJSON(); }, /Cannot call/);
+        assert.throws(function() { 
+            message.toJSON(); 
+        }, /Cannot call/);
 
         assert.end();
     });
@@ -54,13 +62,6 @@ describe(method('toJSON'), function(thing) {
     test(thing('should include index of message if set'), function t(assert) {
         var message = new TestMessage({index: 1});
         assert.equal(message.toJSON().index, 1);
-
-        assert.end();
-    });
-
-    test(thing('should not include index of message if not set'), function t(assert) {
-        var message = new TestMessage();
-        assert.equal(message.toJSON().index, undefined);
 
         assert.end();
     });

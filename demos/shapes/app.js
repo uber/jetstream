@@ -12,7 +12,7 @@ var Shape = jetstream.model('Shape', function() {
 });
 
 var ShapesDemo = jetstream.model('ShapesDemo', function() {
-    this.has('shapes', Shape);
+    this.has('shapes', [Shape]);
 });
 
 // Example of connecting multiple clients to a shared scope
