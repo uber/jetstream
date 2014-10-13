@@ -1,4 +1,4 @@
-var _ = require('underscore');
+var _ = require('lodash');
 var async = require('async');
 var createTestContext = require('./test/test_context');
 var ModelObject = require('../lib/model_object');

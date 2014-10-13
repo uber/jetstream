@@ -1,7 +1,8 @@
-var _ = require('underscore');
+var _ = require('lodash');
 var createTestContext = require('./test/test_context');
 var JSONReader = require('../lib/json_reader');
 var test = require('cached-tape');
+var underscore = require('underscore');
 
 var context = createTestContext('JSONReader');
 var describe = context.describe;
@@ -11,7 +12,7 @@ describe(method('read'), 'when reading JSON', function(thing) {
 
     test(thing('should read and parse JSON passed as Buffer'), function t(assert) {
         var json = {a: 1};
-        var predicate = _.matches(json);
+        var predicate = underscore.matches(json);
         var input = new Buffer(JSON.stringify(json));
         JSONReader.read(input, function(err, result) {
             assert.ifError(err);
@@ -22,7 +23,7 @@ describe(method('read'), 'when reading JSON', function(thing) {
 
     test(thing('should read and parse JSON passed as string'), function t(assert) {
         var json = {a: 1};
-        var predicate = _.matches(json);
+        var predicate = underscore.matches(json);
         var input = JSON.stringify(json);
         JSONReader.read(input, function(err, result) {
             assert.ifError(err);
@@ -33,7 +34,7 @@ describe(method('read'), 'when reading JSON', function(thing) {
 
     test(thing('should read and parse JSON passed as JSON'), function t(assert) {
         var json = {a: 1};
-        var predicate = _.matches(json);
+        var predicate = underscore.matches(json);
         JSONReader.read(json, function(err, result) {
             assert.ifError(err);
             assert.equal(predicate(result), true);

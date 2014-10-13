@@ -1,9 +1,10 @@
-var _ = require('underscore');
+var _ = require('lodash');
 var createTestContext = require('../test/test_context');
 var MessageParser = require('../../lib/message/message_parser');
 var ReplyMessage = require('../../lib/message/reply_message');
 var SessionCreateMessage = require('../../lib/message/session_create_message');
 var test = require('cached-tape');
+var underscore = require('underscore');
 
 var context = createTestContext('MessageParser');
 var describe = context.describe;
@@ -127,7 +128,7 @@ describe(method('composeAsJSON'), 'when creating JSON', function(thing) {
             assert.ok(json);
             assert.equal(json instanceof ReplyMessage, false);
 
-            var predicate = _.matches(message.toJSON());
+            var predicate = underscore.matches(message.toJSON());
             assert.equal(predicate(json), true);
 
             assert.end();
@@ -147,7 +148,7 @@ describe(method('composeAsJSON'), 'when creating JSON', function(thing) {
             messages.forEach(function (message, i) {
                 assert.equal(message instanceof ReplyMessage, true);
 
-                var predicate = _.matches(message.toJSON());
+                var predicate = underscore.matches(message.toJSON());
                 assert.equal(predicate(json[i]), true);
             });
 
