@@ -78,7 +78,29 @@ server.on('session', function(session) {
 });
 ```
 
-## License
+# Protocol
+
+## Messages
+
+The following message types and comprise the sync protocol language:
+- SessionCreate: Create a session with a set of arguments
+- SessionCreateResponse: Accept or deny a client session
+- ScopeFetch: Fetch an a ModelObject graph with a given scope
+- ScopeState: The full state of a fetched scope 
+- ScopeSync: A set of updates for objects in a scope
+- Reply: A reply to a message issued by a party with a response
+
+## SyncFragment
+
+ScopeState and ScopeSync messages contain SyncFragments. A SyncFragment describes an add, change, or removal of an object.
+
+A SyncFragment has the following fields:
+- Type: one of “add”, “change”, “remove”, “movechange”
+- UUID: universal ID that identifies the ModelObject
+- Class name: the class name of the ModelObject
+- Properties: a key-value dictionary of property values for use with “add”, “change” and “movechange”
+
+# License
 
 Jetstream is released under the MIT license. See LICENSE for details.
 
