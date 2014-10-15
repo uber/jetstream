@@ -1,4 +1,3 @@
-var _ = require('lodash');
 var createTestContext = require('../test/test_context');
 var MessageParser = require('../../lib/message/message_parser');
 var ReplyMessage = require('../../lib/message/reply_message');

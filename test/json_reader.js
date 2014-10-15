@@ -1,4 +1,3 @@
-var _ = require('lodash');
 var createTestContext = require('./test/test_context');
 var JSONReader = require('../lib/json_reader');
 var test = require('cached-tape');
