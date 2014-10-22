@@ -8,10 +8,10 @@ var Shape = jetstream.model('Shape', function() {
     this.has('y', Number);
     this.has('width', Number);
     this.has('height', Number);
-    this.has('color', String);
+    this.has('color', Number);
 });
 
-var Canvas = jetstream.model('Canvas', function() {
+var Canvas = jetstream.model('Canvas', function() { 
     this.has('name', String);
     this.has('shapes', [Shape]);
 });

@@ -286,7 +286,7 @@ describe(method('has'), 'when defining primitive model properties', function(thi
             assert.ifError(err);
             assert.equal(parentRelationships.length, 1);
             assert.equal(parentRelationships[0].parent, person);
-            assert.equal(parentRelationships[0].keyPath, 'bestFriend');
+            assert.equal(parentRelationships[0].key, 'bestFriend');
 
             person.bestFriend = null;
 
@@ -789,7 +789,7 @@ describe(method('getParentRelationships'), 'when getting a child\'s parents', fu
         });
     });
 
-    test(thing('should callback with unique set of parent and keyPaths and remove correctly'), function t(assert) {
+    test(thing('should callback with unique set of parent and keys and remove correctly'), function t(assert) {
         var Driver = ModelObject.model('Driver', function() {
             this.has('name', String);
         });
@@ -828,7 +828,7 @@ describe(method('getParentRelationships'), 'when getting a child\'s parents', fu
                 'currentDriver', 
                 'lastThreeDrivers', 
                 'currentDriver'
-            ], _.pluck(parentRelationships, 'keyPath')));
+            ], _.pluck(parentRelationships, 'key')));
 
             rider.currentDriver = null;
             rider.lastThreeDrivers = [otherDriver];
@@ -836,7 +836,7 @@ describe(method('getParentRelationships'), 'when getting a child\'s parents', fu
             driver.getParentRelationships(function(err, newParentRelationships) {
                 assert.ifError(err);
                 assert.ok(_.isEqual([otherRider], _.pluck(parentRelationships, 'parent')));
-                assert.ok(_.isEqual(['currentDriver'], _.pluck(parentRelationships, 'keyPath')));
+                assert.ok(_.isEqual(['currentDriver'], _.pluck(parentRelationships, 'key')));
                 assert.end();
             });
         });
@@ -846,7 +846,7 @@ describe(method('getParentRelationships'), 'when getting a child\'s parents', fu
 
 describe(method('_addParent'), 'when adding parent relationships', function(thing) {
 
-    test(thing('should throw if passed invalid parent or keyPath'), function t(assert) {
+    test(thing('should throw if passed invalid parent or key'), function t(assert) {
         var SomeModel = ModelObject.model('SomeModel', function() {
             this.has('aProperty', String);
         });
@@ -855,11 +855,11 @@ describe(method('_addParent'), 'when adding parent relationships', function(thin
 
         assert.throws(function() {
             someModel._addParent('notamodel', 'someKeyPath');
-        }, /Invalid parent or keyPath/);
+        }, /Invalid parent or key/);
 
         assert.throws(function() {
             someModel._addParent(new SomeModel(), 1);
-        }, /Invalid parent or keyPath/);
+        }, /Invalid parent or key/);
 
         assert.end();
     });
@@ -889,7 +889,7 @@ describe(method('_addParent'), 'when adding parent relationships', function(thin
 
 describe(method('_removeParent'), 'when removing parent relationships', function(thing) {
 
-    test(thing('should throw if passed invalid parent or keyPath'), function t(assert) {
+    test(thing('should throw if passed invalid parent or key'), function t(assert) {
         var SomeModel = ModelObject.model('SomeModel', function() {
             this.has('someModelProperty', this);
         });
@@ -900,16 +900,16 @@ describe(method('_removeParent'), 'when removing parent relationships', function
 
         assert.throws(function() {
             someModel._removeParent('notamodel', 'someModelProperty');
-        }, /Invalid parent or keyPath/);
+        }, /Invalid parent or key/);
 
         assert.throws(function() {
             someModel._removeParent(someOtherModel, 1);
-        }, /Invalid parent or keyPath/);
+        }, /Invalid parent or key/);
 
         assert.end();
     });
 
-    test(thing('should throw if no such parent at keyPath'), function t(assert) {
+    test(thing('should throw if no such parent at key'), function t(assert) {
         var Driver = ModelObject.model('Driver', function() {
             this.has('name', String);
         });
@@ -929,7 +929,7 @@ describe(method('_removeParent'), 'when removing parent relationships', function
 
         assert.throws(function() {
             currentDriver._removeParent(rider, 'lastDriver');
-        }, /No such parent on keyPath/);
+        }, /No such parent on key/);
 
         assert.end();
     });

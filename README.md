@@ -21,6 +21,10 @@ Jetstream for Node is a server that brokers syncing Jetstream models over the Je
 
 `npm install jetstream`
 
+## Run demo
+
+`npm start`
+
 ## Tests
 
 `npm test`
