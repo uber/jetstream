@@ -1,7 +1,7 @@
 var jetstream = require('../../');
 
-// Turn on logging and set to verbose
-jetstream.logger.setLevel('verbose');
+// Turn on logging and set to trace
+jetstream.logger.setLevel('trace');
 
 var Shape = jetstream.model('Shape', function() {
     this.has('x', Number);
