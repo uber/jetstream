@@ -1,3 +1,3 @@
 # Jetstream
 
-NodeJS Jetstream server sync module.
+Jetstream Sync server framework to sync local and remote models.

@@ -1,0 +1,29 @@
+{
+  "name": "jetstream",
+  "version": "0.1.0",
+  "description": "Jetstream Sync server framework to sync local and remote models",
+  "keywords": [
+    "framework",
+    "realtime",
+    "modular"
+  ],
+  "author": "Rob Skillington <r@uber.com>",
+  "repository": "git://github.com/uber/jetstream.git",
+  "main": "index",
+  "homepage": "https://github.com/uber/jetstream",
+  "contributors": [
+    {
+      "name": "Rob Skillington"
+    }
+  ],
+  "bugs": {
+    "url": "https://github.com/uber/jetstream/issues",
+    "email": "r@uber.com"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://github.com/uber/jetstream/LICENSE"
+    }
+  ]
+}
