@@ -1,8 +1,21 @@
 {
   "name": "jetstream",
   "version": "0.1.0",
-  "description": "NodeJS Jetstream server sync module",
-  "main": "index.js",
+  "description": "Jetstream Sync server framework to sync local and remote models",
+  "keywords": [
+    "framework",
+    "realtime",
+    "modular"
+  ],
+  "author": "Rob Skillington <r@uber.com>",
+  "repository": "git://github.com/uber/jetstream.git",
+  "main": "index",
+  "homepage": "https://github.com/uber/jetstream",
+  "contributors": [
+    {
+      "name": "Rob Skillington"
+    }
+  ],
   "scripts": {
     "jshint": "jshint --verbose .",
     "test": "cached-tape test/index.js | tap-spec",
@@ -38,5 +51,15 @@
     "tap-spec": "^1.0.0",
     "tape": "^3.0.0",
     "underscore": "^1.6.0"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/uber/jetstream/issues",
+    "email": "r@uber.com"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://github.com/uber/jetstream/LICENSE"
+    }
+  ]
 }
