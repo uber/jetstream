@@ -1,6 +1,6 @@
 var jetstream = require('../../');
 
-// Turn on logging and set to trace
+// Turn on logging and set to "trace", by default it is set to "silent"
 jetstream.logger.setLevel('trace');
 
 var Shape = jetstream.model('Shape', function() {
