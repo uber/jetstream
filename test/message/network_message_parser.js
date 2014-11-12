@@ -1,11 +1,11 @@
 var createTestContext = require('../test/test_context');
-var MessageParser = require('../../lib/message/message_parser');
+var NetworkMessageParser = require('../../lib/message/network_message_parser');
 var ReplyMessage = require('../../lib/message/reply_message');
 var SessionCreateMessage = require('../../lib/message/session_create_message');
 var test = require('cached-tape');
 var underscore = require('underscore');
 
-var context = createTestContext('MessageParser');
+var context = createTestContext('NetworkMessageParser');
 var describe = context.describe;
 var method = context.method;
 
@@ -13,7 +13,7 @@ describe(method('parseAsRaw'), 'when reading input', function(thing) {
 
     test(thing('should callback with error if reading fails'), function t(assert) {
         var input = 'bah-humbug';
-        MessageParser.parseAsRaw(input, function(err, message) {
+        NetworkMessageParser.parseAsRaw(input, function(err, message) {
             assert.ok(err);
             assert.notOk(message);
             assert.end();
@@ -22,7 +22,7 @@ describe(method('parseAsRaw'), 'when reading input', function(thing) {
 
     test(thing('should parse a ReplyMessage as string'), function t(assert) {
         var input = '{"type": "Reply", "replyTo": 1, "index": 1}';
-        MessageParser.parseAsRaw(input, function(err, message) {
+        NetworkMessageParser.parseAsRaw(input, function(err, message) {
             assert.ifError(err);
             assert.equal(message instanceof ReplyMessage, true);
             assert.end();
@@ -35,7 +35,7 @@ describe(method('parseAsJSON'), 'when reading JSON', function(thing) {
 
     test(thing('should parse a Reply message'), function t(assert) {
         var json = {type: 'Reply', replyTo: 0, index: 0};
-        MessageParser.parseAsJSON(json, function(err, message) {
+        NetworkMessageParser.parseAsJSON(json, function(err, message) {
             assert.ifError(err);
             assert.equal(message instanceof ReplyMessage, true);
             assert.end();
@@ -49,7 +49,7 @@ describe(method('parseAsJSON'), 'when reading JSON', function(thing) {
             version: '1.0.0',
             index: 0
         };
-        MessageParser.parseAsJSON(json, function(err, message) {
+        NetworkMessageParser.parseAsJSON(json, function(err, message) {
             assert.ifError(err);
             assert.equal(message instanceof SessionCreateMessage, true);
             assert.end();
@@ -61,7 +61,7 @@ describe(method('parseAsJSON'), 'when reading JSON', function(thing) {
             {type: 'Reply', replyTo: 0, index: 0},
             {type: 'Reply', replyTo: 1, index: 1}
         ];
-        MessageParser.parseAsJSON(json, function(err, messages) {
+        NetworkMessageParser.parseAsJSON(json, function(err, messages) {
             assert.ifError(err);
             assert.equal(messages instanceof Array, true);
             assert.equal(messages.length, 2);
@@ -73,7 +73,7 @@ describe(method('parseAsJSON'), 'when reading JSON', function(thing) {
     });
 
     test(thing('should callback with error for no input'), function t(assert) {
-        MessageParser.parseAsJSON(null, function(err, message) {
+        NetworkMessageParser.parseAsJSON(null, function(err, message) {
             assert.ok(err);
             assert.notOk(message);
             assert.end();
@@ -81,7 +81,7 @@ describe(method('parseAsJSON'), 'when reading JSON', function(thing) {
     });
 
     test(thing('should callback with error for invalid JSON'), function t(assert) {
-        MessageParser.parseAsJSON('bah-humbug', function(err, message) {
+        NetworkMessageParser.parseAsJSON('bah-humbug', function(err, message) {
             assert.ok(err);
             assert.notOk(message);
             assert.end();
@@ -93,7 +93,7 @@ describe(method('parseAsJSON'), 'when reading JSON', function(thing) {
             type: 'SomethingUnknown',
             someKey: 'someValue'
         };
-        MessageParser.parseAsJSON(json, function(err, message) {
+        NetworkMessageParser.parseAsJSON(json, function(err, message) {
             assert.ok(err);
             assert.notOk(message);
             assert.end();
@@ -101,7 +101,7 @@ describe(method('parseAsJSON'), 'when reading JSON', function(thing) {
     });
 
     test(thing('should callback with error for JSON array with non-objects'), function t(assert) {
-        MessageParser.parseAsJSON(['bah-humbug'], function(err, message) {
+        NetworkMessageParser.parseAsJSON(['bah-humbug'], function(err, message) {
             assert.ok(err);
             assert.notOk(message);
             assert.end();
@@ -109,7 +109,7 @@ describe(method('parseAsJSON'), 'when reading JSON', function(thing) {
     });
 
     test(thing('should callback with error for JSON array with non-messages'), function t(assert) {
-        MessageParser.parseAsJSON([{}], function(err, message) {
+        NetworkMessageParser.parseAsJSON([{}], function(err, message) {
             assert.ok(err);
             assert.notOk(message);
             assert.end();
@@ -122,7 +122,7 @@ describe(method('composeAsJSON'), 'when creating JSON', function(thing) {
 
     test(thing('should be able to compose a Reply message'), function t(assert) {
         var message = new ReplyMessage({replyTo: 0, index: 0});
-        MessageParser.composeAsJSON(message, function(err, json) {
+        NetworkMessageParser.composeAsJSON(message, function(err, json) {
             assert.ifError(err);
             assert.ok(json);
             assert.equal(json instanceof ReplyMessage, false);
@@ -139,7 +139,7 @@ describe(method('composeAsJSON'), 'when creating JSON', function(thing) {
             new ReplyMessage({replyTo: 0, index: 0}),
             new ReplyMessage({replyTo: 1, index: 1})
         ];
-        MessageParser.composeAsJSON(messages, function(err, json) {
+        NetworkMessageParser.composeAsJSON(messages, function(err, json) {
             assert.ifError(err);
             assert.ok(json);
             assert.equal(json instanceof Array, true);
@@ -156,7 +156,7 @@ describe(method('composeAsJSON'), 'when creating JSON', function(thing) {
     });
 
     test(thing('should callback with error for no input'), function t(assert) {
-        MessageParser.composeAsJSON(null, function(err, json) {
+        NetworkMessageParser.composeAsJSON(null, function(err, json) {
             assert.ok(err);
             assert.notOk(json);
             assert.end();
@@ -164,7 +164,7 @@ describe(method('composeAsJSON'), 'when creating JSON', function(thing) {
     });
 
     test(thing('should callback with error for bad input'), function t(assert) {
-        MessageParser.composeAsJSON('bah-humbug', function(err, json) {
+        NetworkMessageParser.composeAsJSON('bah-humbug', function(err, json) {
             assert.ok(err);
             assert.notOk(json);
             assert.end();
@@ -172,7 +172,7 @@ describe(method('composeAsJSON'), 'when creating JSON', function(thing) {
     });
 
     test(thing('should callback with error for array of bad input'), function t(assert) {
-        MessageParser.composeAsJSON(['bah-humbug'], function(err, json) {
+        NetworkMessageParser.composeAsJSON(['bah-humbug'], function(err, json) {
             assert.ok(err);
             assert.notOk(json);
             assert.end();
@@ -184,7 +184,7 @@ describe(method('composeAsJSON'), 'when creating JSON', function(thing) {
         message.toJSON = function() {
             throw new Error('Mock error');
         };
-        MessageParser.composeAsJSON(message, function(err, json) {
+        NetworkMessageParser.composeAsJSON(message, function(err, json) {
             assert.ok(err);
             assert.notOk(json);
             assert.end();

@@ -16,6 +16,7 @@ Jetstream for Node is a server that brokers syncing Jetstream models over the Je
 - If you **found a bug**, fix it and submit a pull request, or open an issue.
 - If you **have a feature request**, implement it and submit a pull request or open an issue.
 - If you **want to contribute**, submit a pull request.
+- For further details see `CONTRIBUTION.md`
 
 ## Installation
 
@@ -38,9 +39,9 @@ Jetstream works with two basic concepts: All your model objects extend from the 
 Let's model a canvas of shapes:
 
 ```js
-var jetstream = require('jetstream');
+var createModel = require('jetstream').model;
 
-var Shape = jetstream.model('Shape', function() {
+var Shape = createModel('Shape', function() {
     this.has('x', Number);
     this.has('y', Number);
     this.has('width', Number);
@@ -48,7 +49,7 @@ var Shape = jetstream.model('Shape', function() {
     this.has('type', Number);
 });
 
-var Canvas = jetstream.model('Canvas', function() {
+var Canvas = createModel('Canvas', function() {
     this.has('name', String);
     this.has('shapes', [Shape]);
 });
@@ -59,27 +60,35 @@ Supported types are `String`, `Number`, `Boolean`, `Date`, `ModelObject` and `[M
 ### Creating a server
 
 ```js
+var createScope = require('../../').scope;
+var createServer = require('jetstream');
+var createWebsocketTransport = require('jetstream').transport.WebsocketTransport.configure;
+var Scope = require('../../').Scope;
+
 // Example of connecting multiple clients to a shared scope
-var scope = new jetstream.Scope({name: 'ShapesDemo'});
 var canvas = new Canvas();
 canvas.name = 'Shapes Demo';
-canvas.setScopeAndMakeRootModel(scope);
 
-// Start server with just Websocket transport on port 3000
-var server = jetstream({
-    transports: [
-        jetstream.transport.WebsocketTransport.configure({port: 3000})
-    ]
+var scope = createScope({name: 'Canvas'});
+scope.setRoot(canvas);
+
+// Start server with default transports
+var server = createServer({
+    transports: [createWebsocketTransport({port: 3000})]
 });
-server.on('session', function(session) {
-    session.on('fetch', function(fetch) {
-        if (fetch.name === scope.name) {
-            fetch.accept(scope);
-        } else {
-            fetch.deny('no such scope');
+server.on('session', function(session, params, callback) {
+    // Accept the session, no authentication or authorization in this example
+    callback();
+
+    session.on('fetch', function(name, params, callback) {
+        // Verify fetching the scope 
+        if (name !== scope.name) {
+            return callback(new Error('No such scope'));
         }
+        callback(null, scope);
     });
 });
+
 ```
 
 # Protocol
@@ -99,10 +108,10 @@ The following message types and comprise the sync protocol language:
 ScopeState and ScopeSync messages contain SyncFragments. A SyncFragment describes an add, change, or removal of an object.
 
 A SyncFragment has the following fields:
-- Type: one of “add”, “change”, “remove”, “movechange”
-- UUID: universal ID that identifies the ModelObject
+- Type: one of “add” or “change”
+- UUID: universal ID that identifies the ModelObject, currently using UUID v4
 - Class name: the class name of the ModelObject
-- Properties: a key-value dictionary of property values for use with “add”, “change” and “movechange”
+- Properties: a key-value dictionary of property values
 
 # License
 

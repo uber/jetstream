@@ -1,5 +1,6 @@
 var _ = require('lodash');
 var ModelObject = require('./lib/model_object');
+var Scope = require('./lib/scope');
 var Server = require('./lib/server');
 
 // Framework server constructor helper
@@ -13,6 +14,10 @@ module.exports = _.extend(module.exports, {
     // Framework methods
     model: function(name, definition) {
         return ModelObject.model(name, definition);
+    },
+
+    scope: function(options) {
+        return new Scope(options);
     },
 
     // Classes
@@ -29,7 +34,8 @@ module.exports = _.extend(module.exports, {
         SyntheticConnection: require('./lib/transport/synthetic_connection')
     },
 
-    Scope: require('./lib/scope'),
+    ModelObject: ModelObject,
+    Scope: Scope,
 
     // Shared instances
     logger: require('./lib/logger')

@@ -1,23 +1,23 @@
-var AbstractMessage = require('../../lib/message/abstract_message');
+var AbstractNetworkMessage = require('../../lib/message/abstract_network_message');
 var createTestContext = require('../test/test_context');
 var test = require('cached-tape');
 var util = require('util');
 
-var context = createTestContext('AbstractMessage');
+var context = createTestContext('AbstractNetworkMessage');
 var describe = context.describe;
 var method = context.method;
 var property = context.property;
 
 function TestMessage() {
-    AbstractMessage.apply(this, arguments);
+    AbstractNetworkMessage.apply(this, arguments);
 }
-util.inherits(TestMessage, AbstractMessage);
+util.inherits(TestMessage, AbstractNetworkMessage);
 TestMessage.type = 'Test';
 
 describe(property('type'), function(thing) {
 
     test(thing('should match its message type'), function t(assert) {
-        assert.equal(AbstractMessage.type, 'Abstract');
+        assert.equal(AbstractNetworkMessage.type, 'Abstract');
         assert.end();
     });
 
@@ -28,7 +28,7 @@ describe(method('constructor'), function(thing) {
     test(thing('should throw if given invalid index'), function t(assert) {
         var message;
         assert.throws(function() {
-            message = new AbstractMessage({index: 'str'});    
+            message = new AbstractNetworkMessage({index: 'str'});    
         }, /requires to be reliably sent/);
 
         assert.end();
@@ -36,7 +36,7 @@ describe(method('constructor'), function(thing) {
 
     test(thing('should be able to set a replyCallback'), function t(assert) {
         var replyCallback = function(){};
-        var message = new AbstractMessage({
+        var message = new AbstractNetworkMessage({
             index: 0, 
             replyCallback: replyCallback
         });
@@ -49,8 +49,8 @@ describe(method('constructor'), function(thing) {
 
 describe(method('toJSON'), function(thing) {
 
-    test(thing('should throw when called for an AbstractMessage'), function t(assert) {
-        var message = new AbstractMessage({index: 0});
+    test(thing('should throw when called for an AbstractNetworkMessage'), function t(assert) {
+        var message = new AbstractNetworkMessage({index: 0});
 
         assert.throws(function() { 
             message.toJSON(); 
