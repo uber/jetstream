@@ -693,13 +693,11 @@ describe(method('getChildModelObjectUUIDs'), 'when getting child UUIDs', functio
         parent.partner = otherParent;
         parent.children = [child1, child2];
 
-        parent.getChildModelObjectUUIDs(function(err, uuids) {
-            assert.ifError(err);
-            assert.ok(_.isEqual(_.map([otherParent, child1, child2], function(modelObject) {
-                return modelObject.uuid;
-            }), uuids));
-            assert.end();
-        });
+        var uuids = parent.getChildModelObjectUUIDs();
+        assert.ok(_.isEqual(_.map([otherParent, child1, child2], function(modelObject) {
+            return modelObject.uuid;
+        }), uuids));
+        assert.end();
     }); 
 
 });
@@ -749,23 +747,20 @@ describe(method('getAddSyncFragment'), 'when getting ModelObject as an add fragm
         parent.partner = otherParent;
         parent.children = [child1, child2];
 
-        parent.getAddSyncFragment(function(err, syncFragment) {
-            assert.ifError(err);
+        var syncFragment = parent.getAddSyncFragment();
+        assert.equal(syncFragment.type, 'add');
+        assert.equal(syncFragment.objectUUID, parent.uuid);
+        assert.equal(syncFragment.clsName, 'Person');
 
-            assert.equal(syncFragment.type, 'add');
-            assert.equal(syncFragment.objectUUID, parent.uuid);
-            assert.equal(syncFragment.clsName, 'Person');
+        var values = syncFragment.properties;
+        assert.equal(Object.keys(values).length, 5);
+        assert.equal(values.name, 'Sam');
+        assert.equal(values.age, 28);
+        assert.ok(_.isEqual(values.nicknames, ['samster', 'samsonite']));
+        assert.equal(values.partner, otherParent.uuid);
+        assert.ok(_.isEqual(values.children, [child1.uuid, child2.uuid]));
 
-            var values = syncFragment.properties;
-            assert.equal(Object.keys(values).length, 5);
-            assert.equal(values.name, 'Sam');
-            assert.equal(values.age, 28);
-            assert.ok(_.isEqual(values.nicknames, ['samster', 'samsonite']));
-            assert.equal(values.partner, otherParent.uuid);
-            assert.ok(_.isEqual(values.children, [child1.uuid, child2.uuid]));
-
-            assert.end();
-        });
+        assert.end();
     });
 
 });
