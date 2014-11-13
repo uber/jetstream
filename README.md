@@ -16,7 +16,7 @@ Jetstream for Node is a server that brokers syncing Jetstream models over the Je
 - If you **found a bug**, fix it and submit a pull request, or open an issue.
 - If you **have a feature request**, implement it and submit a pull request or open an issue.
 - If you **want to contribute**, submit a pull request.
-- For further details see `CONTRIBUTION.md`
+- For further details see `CONTRIBUTION.md`.
 
 ## Installation
 
@@ -29,6 +29,10 @@ Jetstream for Node is a server that brokers syncing Jetstream models over the Je
 ## Tests
 
 `npm test`
+
+## Documentation
+
+See the `docs` directory. A good start is with `docs/overview.md`.
 
 # Usage
 
@@ -60,10 +64,10 @@ Supported types are `String`, `Number`, `Boolean`, `Date`, `ModelObject` and `[M
 ### Creating a server
 
 ```js
-var createScope = require('../../').scope;
+var createScope = require('jetstream').scope;
 var createServer = require('jetstream');
 var createWebsocketTransport = require('jetstream').transport.WebsocketTransport.configure;
-var Scope = require('../../').Scope;
+var Scope = require('jetstream').Scope;
 
 // Example of connecting multiple clients to a shared scope
 var canvas = new Canvas();
