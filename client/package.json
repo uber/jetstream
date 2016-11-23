@@ -20,7 +20,7 @@
   "dependencies": {
     "keymirror": "~0.1.0",
     "lodash": "~2.4.0",
-    "node-uuid": "~1.4.0"
+    "uuid": "~3.0.0"
   },
   "devDependencies": {
     "browserify": "~6.2.0",

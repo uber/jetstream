@@ -26,7 +26,7 @@ var ModelObject = require('../lib/model_object');
 var Scope = require('../lib/scope');
 var sinon = require('sinon');
 var redtape = require('redtape');
-var uuid = require('node-uuid');
+var uuid = require('uuid');
 
 var context = createTestContext('ModelObject');
 var describe = context.describe;

@@ -31,7 +31,7 @@ var ModelCollection = require('./model-collection');
 var ModelParentRelationship = require('./model-parent-relationship');
 var ModelProperty = require('./model-property');
 var util = require('util');
-var uuid = require('node-uuid');
+var uuid = require('uuid');
 
 var _models = {};
 
