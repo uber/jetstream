@@ -28,7 +28,7 @@ var sinon = require('sinon');
 var SyncFragment = require('../../lib/sync_fragment');
 var SyncProcedureResult = require('../../lib/procedures/sync_procedure_result');
 var redtape = require('redtape');
-var uuid = require('node-uuid');
+var uuid = require('uuid');
 
 var context = createTestContext('RemoteHttpSyncProcedure');
 var describe = context.describe;

@@ -29,7 +29,7 @@ var Scope = require('../lib/scope');
 var Shape = require('../demos/shapes').Shape;
 var sinon = require('sinon');
 var SyncFragment = require('../lib/sync_fragment');
-var uuid = require('node-uuid');
+var uuid = require('uuid');
 
 var context = createTestContext('Scope');
 var describe = context.describe;
